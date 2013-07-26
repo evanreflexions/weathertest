@@ -29,7 +29,7 @@
       </td>
     </tr>
       <tr style="text-align:center;">
-      <td colspan="2">
+      <td colspan="3">
         <input type="submit">
       </td>
     </tr>
@@ -43,10 +43,11 @@
 <?php
   include('forecast.io-php-api/lib/forecast.io.php');
   
-$latitude = '41.130573';
-$longitude = '-73.828919';
+$lookup_zip = json_decode(file_get_contents('http://maps.googleapis.com/maps/api/geocode/json?address=' . $_GET["zip-code"] . '&sensor=false'));
+$latitude = $lookup_zip->results[0]->geometry->location->lat;
+$longitude = $lookup_zip->results[0]->geometry->location->lng;
 
-echo "Showing weather from " . $_GET["begin-date"] . " to " . $_GET["end-date"];
+echo 'Showing weather from ' . $_GET['begin-date'] . ' to ' . $_GET['end-date'] . ' in ' . $lookup_zip->results[0]->address_components[1]->long_name . '.';
 date_default_timezone_set('UTC');
 $begin_date = strtotime($_GET["begin-date"]) + 1;
 $end_date = strtotime($_GET["end-date"]) + 1;
@@ -54,7 +55,6 @@ echo "<br />";
 
 $api_key = 'd5cc645c8a6f195462b8a38684648963';
   
-
 if($begin_date >= $end_date){
 echo "Error: Please select an end date after the begin date.";
 }else{
