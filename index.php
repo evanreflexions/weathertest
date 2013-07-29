@@ -29,7 +29,11 @@
       </td>
     </tr>
       <tr style="text-align:center;">
-      <td colspan="3">
+      <td>
+        <input type="radio" name="datasource" value="noaa">NOAA Data<br>
+        <input type="radio" name="datasource" value="fio">Forecast.io Data
+      </td>
+      <td colspan="2">
         <input type="submit">
       </td>
     </tr>
@@ -66,6 +70,8 @@ echo '<table style="text-align:center;">
 <td style="padding:5px;">Low Temperature</td>
 <td style="padding:5px;">High Temperature</td>
 </tr>';
+
+if($_GET['datasource']=='fio'){
   for($i=$begin_date;$i<=$end_date;$i+=86400){
     $forecast = new ForecastIO($api_key);
     $condition = $forecast->getHistoricalConditions($latitude, $longitude, $i);
@@ -78,9 +84,23 @@ echo '<table style="text-align:center;">
       <td>' . $condition->getMaxTemperature() . '</td>
     </tr>';
   }
+} else if($_GET['datasource']=='noaa') {
+  echo date('Y-m-d',  $begin_date);
+  $xml = new SimpleXMLElement(file_get_contents('http://graphical.weather.gov/xml/sample_products/browser_interface/ndfdXMLclient.php?zipCodeList=' . $_GET["zip-code"] . '&product=time-series&begin=' . date('Y-m-d', $begin_date) . 'T00:00:00&end='.date('Y-m-d', $end_date).'T00:00:00&maxt=maxt'));
+  foreach($xml->data->parameters->temperature->value as $val){
+    
+      '<tr>
+      <td>' 
+        . date("F d, Y") . 
+      '</td>
+      <td>' . '</td>
+      <td>' . $val . '</td>
+    </tr>';
 
+    }
+
+  }
 }
-
 function c_to_f($c){
   return($c * 9 / 5 + 32);
 }
